@@ -73,7 +73,7 @@ container_port() {
 }
 
 add_dest_nat() {
-	local rule="$1" desc="$2" dest="$3" port="$4" proto="$5"
+	local rule="$1" desc="$2" dest="$3" port="$4" proto="$5" tport="${6:-$4}"
 	multi_set "nat destination rule ${rule}" \
 		"description \"${desc}\"" \
 		"destination address ${SELF_IP}" \
@@ -81,16 +81,18 @@ add_dest_nat() {
 		"inbound-interface name ${LAN_IF}" \
 		"protocol ${proto}" \
 		"translation address ${dest}" \
-		"translation port ${port}"
+		"translation port ${tport}"
 }
 
 persist_pass() {
 	if [ -z ${DRY_RUN+x} ]; then
 		local file="$1"
 		if [ ! -f "${file}" ]; then
-			openssl rand -base64 24 > "${file}"
+			openssl rand -base64 24 | sudo tee "${file}"
+			sudo chmod 600 "${file}"
+		else
+			sudo cat "${file}"
 		fi
-		cat "${file}"
 	else
 		openssl rand -base64 24
 	fi
