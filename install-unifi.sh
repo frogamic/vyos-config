@@ -1,4 +1,4 @@
-#!/bin/vbash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -83,7 +83,7 @@ container() {
 
 container_base() {
 	local name="$1" image="$2"
-	# SET_CMDS+=("run add container image \"${image}\"")
+	SET_CMDS+=("run add container image \"${image}\"")
 	container "${name}" "image \"${image}\""
 	container "${name}" "restart always"
 }
@@ -146,8 +146,9 @@ fi
 MONGO_PASS="$(persist_pass "${MONGO_DIR}/user.password")"
 MONGO_INITDB_ROOT_PASSWORD="$(persist_pass "${MONGO_DIR}/root.password")"
 
-add_set container network "${NETWORK}" prefix "${NETWORK_PREFIX}"
-add_set container network "${NETWORK}" gateway "${NETWORK_GATEWAY}"
+multi_set container network "${NETWORK}" \
+	"prefix \"${NETWORK_PREFIX}\"" \
+	"gateway \"${NETWORK_GATEWAY}\""
 
 ################################################################################
 #
